@@ -1,0 +1,868 @@
+<html>
+<head>
+<title>Payment.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+.s4 { color: #2aacb8;}
+.s5 { color: #7a7e85;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Payment.java</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">javax</span><span class="s2">.</span><span class="s1">swing</span><span class="s2">.*;</span>
+<span class="s0">import </span><span class="s1">javax</span><span class="s2">.</span><span class="s1">swing</span><span class="s2">.</span><span class="s1">border</span><span class="s2">.</span><span class="s1">Border</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">awt</span><span class="s2">.*;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">awt</span><span class="s2">.</span><span class="s1">event</span><span class="s2">.*;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">sql</span><span class="s2">.</span><span class="s1">Connection</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">sql</span><span class="s2">.</span><span class="s1">DriverManager</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">sql</span><span class="s2">.</span><span class="s1">PreparedStatement</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">sql</span><span class="s2">.</span><span class="s1">SQLException</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">sql</span><span class="s2">.*;</span>
+
+<span class="s0">import static </span><span class="s1">java</span><span class="s2">.</span><span class="s1">awt</span><span class="s2">.</span><span class="s1">Color</span><span class="s2">.*;</span>
+
+<span class="s0">class </span><span class="s1">Payment </span><span class="s0">extends </span><span class="s1">JFrame </span><span class="s0">implements </span><span class="s1">ActionListener</span><span class="s2">, </span><span class="s1">ItemListener </span><span class="s2">{</span>
+    <span class="s1">JPasswordField pass_word</span><span class="s2">, </span><span class="s1">rg_password</span><span class="s2">;</span>
+    <span class="s1">JTextField tf_user_name</span><span class="s2">, </span><span class="s1">tf_email</span><span class="s2">, </span><span class="s1">tf_amount</span><span class="s2">, </span><span class="s1">tf_mobile_no</span><span class="s2">, </span><span class="s1">tf_account_no</span><span class="s2">, </span><span class="s1">rg_tf_user_name</span><span class="s2">;</span>
+    <span class="s1">JLabel lb_user_name</span><span class="s2">, </span><span class="s1">lb_password</span><span class="s2">, </span><span class="s1">lb_email</span><span class="s2">, </span><span class="s1">lb_amount</span><span class="s2">, </span><span class="s1">lb_mobile_no</span><span class="s2">, </span><span class="s1">lb_account_no</span><span class="s2">, </span><span class="s1">rg_user_name</span><span class="s2">, </span><span class="s1">lb_rg_password</span><span class="s2">;</span>
+    <span class="s1">JButton loginButton</span><span class="s2">, </span><span class="s1">resetButton</span><span class="s2">, </span><span class="s1">registerButton</span><span class="s2">, </span><span class="s1">sign_up</span><span class="s2">;</span>
+    <span class="s0">static final </span><span class="s1">String DB_URL </span><span class="s2">= </span><span class="s3">&quot;jdbc:mysql://localhost:3306/myappdb&quot;</span><span class="s2">;</span>
+    <span class="s0">static final </span><span class="s1">String DB_USER </span><span class="s2">= </span><span class="s3">&quot;root&quot;</span><span class="s2">;</span>
+    <span class="s0">static final </span><span class="s1">String DB_PASSWORD </span><span class="s2">= </span><span class="s3">&quot;&quot;</span><span class="s2">;</span>
+    <span class="s1">JFrame f</span><span class="s2">, </span><span class="s1">f_register</span><span class="s2">;</span>
+    <span class="s1">Font fh </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Trebuchet MS&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">BOLD</span><span class="s2">, </span><span class="s4">12</span><span class="s2">);</span>
+
+    <span class="s0">public </span><span class="s1">Payment</span><span class="s2">() {</span>
+
+        <span class="s1">f </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JFrame</span><span class="s2">(</span><span class="s3">&quot;Payment gateway&quot;</span><span class="s2">);</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">setSize</span><span class="s2">(</span><span class="s4">480</span><span class="s2">, </span><span class="s4">550</span><span class="s2">);</span>
+        <span class="s1">Border blackline </span><span class="s2">= </span><span class="s1">BorderFactory</span><span class="s2">.</span><span class="s1">createLineBorder</span><span class="s2">(</span><span class="s1">black</span><span class="s2">, </span><span class="s4">2</span><span class="s2">);</span>
+        <span class="s1">lb_user_name </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Username&quot;</span><span class="s2">);</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_user_name</span><span class="s2">);</span>
+        <span class="s1">lb_user_name</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s1">fh</span><span class="s2">);</span>
+        <span class="s1">lb_user_name</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">30</span><span class="s2">, </span><span class="s4">20</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">100</span><span class="s2">);</span>
+        <span class="s1">lb_user_name</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">tf_user_name </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">(</span><span class="s4">20</span><span class="s2">);</span>
+        <span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">blackline</span><span class="s2">);</span>
+        <span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">100</span><span class="s2">, </span><span class="s4">55</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">tf_user_name</span><span class="s2">);</span>
+        <span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;&quot;</span><span class="s2">,</span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">,</span><span class="s4">14</span><span class="s2">));</span>
+        <span class="s1">lb_password </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Password&quot;</span><span class="s2">);</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_password</span><span class="s2">);</span>
+        <span class="s1">lb_password</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">30</span><span class="s2">, </span><span class="s4">80</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">100</span><span class="s2">);</span>
+        <span class="s1">lb_password</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">lb_password</span><span class="s2">.</span><span class="s1">setHorizontalTextPosition</span><span class="s2">(</span><span class="s1">JPasswordField</span><span class="s2">.</span><span class="s1">LEFT</span><span class="s2">);</span>
+        <span class="s1">pass_word </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JPasswordField</span><span class="s2">(</span><span class="s4">20</span><span class="s2">);</span>
+        <span class="s1">pass_word</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;&quot;</span><span class="s2">,</span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">,</span><span class="s4">14</span><span class="s2">));</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">pass_word</span><span class="s2">);</span>
+        <span class="s1">pass_word</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">100</span><span class="s2">, </span><span class="s4">115</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">pass_word</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">blackline</span><span class="s2">);</span>
+        <span class="s1">loginButton </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JButton</span><span class="s2">(</span><span class="s3">&quot;LOGIN&quot;</span><span class="s2">);</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">loginButton</span><span class="s2">);</span>
+        <span class="s1">loginButton</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">130</span><span class="s2">, </span><span class="s4">190</span><span class="s2">, </span><span class="s4">80</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">loginButton</span><span class="s2">.</span><span class="s1">addActionListener</span><span class="s2">(</span><span class="s0">this</span><span class="s2">);</span>
+        <span class="s1">loginButton</span><span class="s2">.</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">233</span><span class="s2">, </span><span class="s4">242</span><span class="s2">, </span><span class="s4">162</span><span class="s2">));</span>
+        <span class="s1">resetButton </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JButton</span><span class="s2">(</span><span class="s3">&quot;RESET&quot;</span><span class="s2">);</span>
+        <span class="s1">resetButton</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">230</span><span class="s2">, </span><span class="s4">190</span><span class="s2">, </span><span class="s4">80</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">resetButton</span><span class="s2">);</span>
+        <span class="s1">resetButton</span><span class="s2">.</span><span class="s1">addActionListener</span><span class="s2">(</span><span class="s0">this</span><span class="s2">);</span>
+        <span class="s1">resetButton</span><span class="s2">.</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">156</span><span class="s2">, </span><span class="s4">211</span><span class="s2">, </span><span class="s4">217</span><span class="s2">));</span>
+        <span class="s1">registerButton </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JButton</span><span class="s2">(</span><span class="s3">&quot;Register&quot;</span><span class="s2">);</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">registerButton</span><span class="s2">);</span>
+        <span class="s1">registerButton</span><span class="s2">.</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">3</span><span class="s2">, </span><span class="s4">140</span><span class="s2">, </span><span class="s4">76</span><span class="s2">));</span>
+        <span class="s1">registerButton</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">WHITE</span><span class="s2">);</span>
+        <span class="s1">registerButton</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">170</span><span class="s2">, </span><span class="s4">250</span><span class="s2">, </span><span class="s4">100</span><span class="s2">, </span><span class="s4">31</span><span class="s2">);</span>
+        <span class="s1">registerButton</span><span class="s2">.</span><span class="s1">addActionListener</span><span class="s2">(</span><span class="s0">this</span><span class="s2">);</span>
+        <span class="s1">registerButton</span><span class="s2">.</span><span class="s1">setCursor</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Cursor</span><span class="s2">(</span><span class="s1">Cursor</span><span class="s2">.</span><span class="s1">HAND_CURSOR</span><span class="s2">));</span>
+        <span class="s1">loginButton</span><span class="s2">.</span><span class="s1">setCursor</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Cursor</span><span class="s2">(</span><span class="s1">Cursor</span><span class="s2">.</span><span class="s1">HAND_CURSOR</span><span class="s2">));</span>
+        <span class="s1">resetButton</span><span class="s2">.</span><span class="s1">setCursor</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Cursor</span><span class="s2">(</span><span class="s1">Cursor</span><span class="s2">.</span><span class="s1">HAND_CURSOR</span><span class="s2">));</span>
+
+<span class="s5">//        f.setResizable(false);</span>
+
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">setLayout</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">setLocationRelativeTo</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">setVisible</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">setIconImage</span><span class="s2">(</span><span class="s0">new </span><span class="s1">ImageIcon</span><span class="s2">(</span><span class="s3">&quot;src/credit-cards.png&quot;</span><span class="s2">).</span><span class="s1">getImage</span><span class="s2">());</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">getContentPane</span><span class="s2">().</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">0xFF361049</span><span class="s2">, </span><span class="s0">true</span><span class="s2">));</span>
+        <span class="s1">f</span><span class="s2">.</span><span class="s1">setDefaultCloseOperation</span><span class="s2">(</span><span class="s1">WindowConstants</span><span class="s2">.</span><span class="s1">EXIT_ON_CLOSE</span><span class="s2">);</span>
+    <span class="s2">}</span>
+    <span class="s0">public void </span><span class="s1">register</span><span class="s2">() {</span>
+        <span class="s1">f_register </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JFrame</span><span class="s2">(</span><span class="s3">&quot;Sign Up&quot;</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s1">BLACK</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">setIconImage</span><span class="s2">(</span><span class="s0">new </span><span class="s1">ImageIcon</span><span class="s2">(</span><span class="s3">&quot;src/credit-cards.png&quot;</span><span class="s2">).</span><span class="s1">getImage</span><span class="s2">());</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">setSize</span><span class="s2">(</span><span class="s4">480</span><span class="s2">, </span><span class="s4">550</span><span class="s2">);</span>
+        <span class="s1">Border blackline </span><span class="s2">= </span><span class="s1">BorderFactory</span><span class="s2">.</span><span class="s1">createLineBorder</span><span class="s2">(</span><span class="s1">orange</span><span class="s2">, </span><span class="s4">3</span><span class="s2">);</span>
+        <span class="s1">rg_user_name </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Username&quot;</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">rg_user_name</span><span class="s2">);</span>
+        <span class="s1">rg_user_name</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">30</span><span class="s2">, </span><span class="s4">20</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">100</span><span class="s2">);</span>
+        <span class="s1">rg_user_name</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">rg_tf_user_name </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">(</span><span class="s4">20</span><span class="s2">);</span>
+        <span class="s1">rg_tf_user_name</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">blackline</span><span class="s2">);</span>
+        <span class="s1">rg_tf_user_name</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">100</span><span class="s2">, </span><span class="s4">55</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">rg_tf_user_name</span><span class="s2">);</span>
+        <span class="s1">lb_rg_password </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Password&quot;</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_rg_password</span><span class="s2">);</span>
+        <span class="s1">lb_rg_password</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">30</span><span class="s2">, </span><span class="s4">80</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">100</span><span class="s2">);</span>
+        <span class="s1">lb_rg_password</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">rg_password </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JPasswordField</span><span class="s2">(</span><span class="s4">20</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">rg_password</span><span class="s2">);</span>
+        <span class="s1">rg_password</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">100</span><span class="s2">, </span><span class="s4">115</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">rg_password</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">blackline</span><span class="s2">);</span>
+        <span class="s1">lb_email </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Email id:&quot;</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_email</span><span class="s2">);</span>
+        <span class="s1">lb_email</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">30</span><span class="s2">, </span><span class="s4">140</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">100</span><span class="s2">);</span>
+        <span class="s1">lb_email</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">tf_email </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">(</span><span class="s4">20</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">tf_email</span><span class="s2">);</span>
+        <span class="s1">tf_email</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">blackline</span><span class="s2">);</span>
+        <span class="s1">tf_email</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">100</span><span class="s2">, </span><span class="s4">175</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+
+        <span class="s1">lb_mobile_no </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Mobile No:&quot;</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_mobile_no</span><span class="s2">);</span>
+        <span class="s1">lb_mobile_no</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">30</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">100</span><span class="s2">);</span>
+        <span class="s1">lb_mobile_no</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">tf_mobile_no </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">(</span><span class="s4">20</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">tf_mobile_no</span><span class="s2">);</span>
+        <span class="s1">tf_mobile_no</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">blackline</span><span class="s2">);</span>
+        <span class="s1">tf_mobile_no</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">100</span><span class="s2">, </span><span class="s4">235</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">tf_mobile_no</span><span class="s2">.</span><span class="s1">addKeyListener</span><span class="s2">(</span><span class="s0">new </span><span class="s1">KeyAdapter</span><span class="s2">() {</span>
+            <span class="s0">public void </span><span class="s1">keyTyped</span><span class="s2">(</span><span class="s1">KeyEvent e</span><span class="s2">) {</span>
+                <span class="s0">char </span><span class="s1">c </span><span class="s2">= </span><span class="s1">e</span><span class="s2">.</span><span class="s1">getKeyChar</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(((</span><span class="s1">c </span><span class="s2">&lt; </span><span class="s3">'0'</span><span class="s2">) || (</span><span class="s1">c </span><span class="s2">&gt; </span><span class="s3">'9'</span><span class="s2">))</span>
+                        <span class="s2">&amp;&amp; (</span><span class="s1">c </span><span class="s2">!= </span><span class="s3">'</span><span class="s0">\b</span><span class="s3">'</span><span class="s2">)) {</span>
+                    <span class="s1">e</span><span class="s2">.</span><span class="s1">consume</span><span class="s2">();</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+        <span class="s2">});</span>
+        <span class="s1">lb_account_no </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Account No:&quot;</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_account_no</span><span class="s2">);</span>
+        <span class="s1">lb_account_no</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">lb_account_no</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">30</span><span class="s2">, </span><span class="s4">260</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">100</span><span class="s2">);</span>
+        <span class="s1">tf_account_no </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">(</span><span class="s4">20</span><span class="s2">);</span>
+        <span class="s1">tf_account_no</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">blackline</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">tf_account_no</span><span class="s2">);</span>
+        <span class="s1">tf_account_no</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">100</span><span class="s2">, </span><span class="s4">295</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">tf_account_no</span><span class="s2">.</span><span class="s1">addKeyListener</span><span class="s2">(</span><span class="s0">new </span><span class="s1">KeyAdapter</span><span class="s2">() {</span>
+            <span class="s0">public void </span><span class="s1">keyTyped</span><span class="s2">(</span><span class="s1">KeyEvent e</span><span class="s2">) {</span>
+                <span class="s0">char </span><span class="s1">c </span><span class="s2">= </span><span class="s1">e</span><span class="s2">.</span><span class="s1">getKeyChar</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(((</span><span class="s1">c </span><span class="s2">&lt; </span><span class="s3">'0'</span><span class="s2">) || (</span><span class="s1">c </span><span class="s2">&gt; </span><span class="s3">'9'</span><span class="s2">))</span>
+                        <span class="s2">&amp;&amp; (</span><span class="s1">c </span><span class="s2">!= </span><span class="s3">'</span><span class="s0">\b</span><span class="s3">'</span><span class="s2">)) {</span>
+                    <span class="s1">e</span><span class="s2">.</span><span class="s1">consume</span><span class="s2">();</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+        <span class="s2">});</span>
+
+
+        <span class="s1">lb_amount </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Balance &quot;</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_amount</span><span class="s2">);</span>
+        <span class="s1">lb_amount</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">lb_amount</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">30</span><span class="s2">, </span><span class="s4">320</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">100</span><span class="s2">);</span>
+        <span class="s1">tf_amount </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">(</span><span class="s4">20</span><span class="s2">);</span>
+        <span class="s1">tf_amount</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">blackline</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">tf_amount</span><span class="s2">);</span>
+        <span class="s1">tf_amount</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">100</span><span class="s2">, </span><span class="s4">355</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">tf_amount</span><span class="s2">.</span><span class="s1">addKeyListener</span><span class="s2">(</span><span class="s0">new </span><span class="s1">KeyAdapter</span><span class="s2">() {</span>
+            <span class="s0">public void </span><span class="s1">keyTyped</span><span class="s2">(</span><span class="s1">KeyEvent e</span><span class="s2">) {</span>
+                <span class="s0">char </span><span class="s1">c </span><span class="s2">= </span><span class="s1">e</span><span class="s2">.</span><span class="s1">getKeyChar</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(((</span><span class="s1">c </span><span class="s2">&lt; </span><span class="s3">'0'</span><span class="s2">) || (</span><span class="s1">c </span><span class="s2">&gt; </span><span class="s3">'9'</span><span class="s2">))</span>
+                        <span class="s2">&amp;&amp; (</span><span class="s1">c </span><span class="s2">!= </span><span class="s3">'</span><span class="s0">\b</span><span class="s3">'</span><span class="s2">)) {</span>
+                    <span class="s1">e</span><span class="s2">.</span><span class="s1">consume</span><span class="s2">();</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+        <span class="s2">});</span>
+
+
+        <span class="s1">sign_up </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JButton</span><span class="s2">(</span><span class="s3">&quot;Submit&quot;</span><span class="s2">);</span>
+        <span class="s1">sign_up</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">180</span><span class="s2">, </span><span class="s4">420</span><span class="s2">, </span><span class="s4">120</span><span class="s2">, </span><span class="s4">34</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">sign_up</span><span class="s2">);</span>
+        <span class="s1">sign_up</span><span class="s2">.</span><span class="s1">setCursor</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Cursor</span><span class="s2">(</span><span class="s1">Cursor</span><span class="s2">.</span><span class="s1">HAND_CURSOR</span><span class="s2">));</span>
+        <span class="s1">sign_up</span><span class="s2">.</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">255</span><span class="s2">, </span><span class="s4">252</span><span class="s2">, </span><span class="s4">0</span><span class="s2">));</span>
+        <span class="s1">sign_up</span><span class="s2">.</span><span class="s1">addActionListener</span><span class="s2">(</span><span class="s0">this</span><span class="s2">);</span>
+
+
+        <span class="s1">lb_password</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">lb_password</span><span class="s2">.</span><span class="s1">setHorizontalTextPosition</span><span class="s2">(</span><span class="s1">JPasswordField</span><span class="s2">.</span><span class="s1">LEFT</span><span class="s2">);</span>
+        <span class="s1">pass_word </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JPasswordField</span><span class="s2">(</span><span class="s4">20</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">pass_word</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">setDefaultCloseOperation</span><span class="s2">(</span><span class="s1">JFrame</span><span class="s2">.</span><span class="s1">EXIT_ON_CLOSE</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">setLocationRelativeTo</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">setLayout</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">getContentPane</span><span class="s2">().</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">0xFF0E2729</span><span class="s2">, </span><span class="s0">true</span><span class="s2">));</span>
+        <span class="s1">f_register</span><span class="s2">.</span><span class="s1">setVisible</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+
+    <span class="s2">}</span>
+
+    <span class="s1">JLabel hello</span><span class="s2">;</span>
+    <span class="s1">JFrame lg_frame</span><span class="s2">;</span>
+    <span class="s1">JButton credit_card</span><span class="s2">, </span><span class="s1">paypal</span><span class="s2">, </span><span class="s1">bank_account</span><span class="s2">;</span>
+
+    <span class="s0">public void </span><span class="s1">login</span><span class="s2">() {</span>
+
+        <span class="s1">lg_frame </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JFrame</span><span class="s2">(</span><span class="s3">&quot;Payment gateway&quot;</span><span class="s2">);</span>
+        <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">setSize</span><span class="s2">(</span><span class="s4">480</span><span class="s2">, </span><span class="s4">550</span><span class="s2">);</span>
+        <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">setIconImage</span><span class="s2">(</span><span class="s0">new </span><span class="s1">ImageIcon</span><span class="s2">(</span><span class="s3">&quot;src/credit-cards.png&quot;</span><span class="s2">).</span><span class="s1">getImage</span><span class="s2">());</span>
+        <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">setLayout</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">hello </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;welcome &quot; </span><span class="s2">+ </span><span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">() + </span><span class="s3">&quot;!&quot;</span><span class="s2">, </span><span class="s1">SwingConstants</span><span class="s2">.</span><span class="s1">CENTER</span><span class="s2">);</span>
+        <span class="s1">hello</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">hello</span><span class="s2">);</span>
+        <span class="s1">hello</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">90</span><span class="s2">, </span><span class="s4">40</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">50</span><span class="s2">);</span>
+        <span class="s1">hello</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Serif&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">BOLD</span><span class="s2">, </span><span class="s4">26</span><span class="s2">));</span>
+        <span class="s1">credit_card </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JButton</span><span class="s2">(</span><span class="s3">&quot;Credit card Payment&quot;</span><span class="s2">);</span>
+        <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">credit_card</span><span class="s2">);</span>
+        <span class="s1">credit_card</span><span class="s2">.</span><span class="s1">addActionListener</span><span class="s2">(</span><span class="s0">this</span><span class="s2">);</span>
+        <span class="s1">credit_card</span><span class="s2">.</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s1">yellow</span><span class="s2">);</span>
+        <span class="s1">credit_card</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">160</span><span class="s2">, </span><span class="s4">140</span><span class="s2">, </span><span class="s4">150</span><span class="s2">, </span><span class="s4">70</span><span class="s2">);</span>
+        <span class="s1">credit_card</span><span class="s2">.</span><span class="s1">setCursor</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Cursor</span><span class="s2">(</span><span class="s1">Cursor</span><span class="s2">.</span><span class="s1">HAND_CURSOR</span><span class="s2">));</span>
+        <span class="s1">bank_account </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JButton</span><span class="s2">(</span><span class="s3">&quot;Bank Transfer&quot;</span><span class="s2">);</span>
+        <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">bank_account</span><span class="s2">);</span>
+        <span class="s1">bank_account</span><span class="s2">.</span><span class="s1">setCursor</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Cursor</span><span class="s2">(</span><span class="s1">Cursor</span><span class="s2">.</span><span class="s1">HAND_CURSOR</span><span class="s2">));</span>
+        <span class="s1">bank_account</span><span class="s2">.</span><span class="s1">addActionListener</span><span class="s2">(</span><span class="s0">this</span><span class="s2">);</span>
+        <span class="s1">bank_account</span><span class="s2">.</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s1">GREEN</span><span class="s2">);</span>
+        <span class="s1">bank_account</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">160</span><span class="s2">, </span><span class="s4">240</span><span class="s2">, </span><span class="s4">150</span><span class="s2">, </span><span class="s4">70</span><span class="s2">);</span>
+        <span class="s1">paypal </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JButton</span><span class="s2">(</span><span class="s3">&quot;Paypal Payment&quot;</span><span class="s2">);</span>
+        <span class="s1">paypal</span><span class="s2">.</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s1">orange</span><span class="s2">);</span>
+        <span class="s1">paypal</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">160</span><span class="s2">, </span><span class="s4">340</span><span class="s2">, </span><span class="s4">150</span><span class="s2">, </span><span class="s4">70</span><span class="s2">);</span>
+        <span class="s1">paypal</span><span class="s2">.</span><span class="s1">setCursor</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Cursor</span><span class="s2">(</span><span class="s1">Cursor</span><span class="s2">.</span><span class="s1">HAND_CURSOR</span><span class="s2">));</span>
+        <span class="s1">paypal</span><span class="s2">.</span><span class="s1">addActionListener</span><span class="s2">(</span><span class="s0">this</span><span class="s2">);</span>
+        <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">paypal</span><span class="s2">);</span>
+        <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">setLocationRelativeTo</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">setVisible</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+        <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">setLayout</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">getContentPane</span><span class="s2">().</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">0xFF361049</span><span class="s2">, </span><span class="s0">true</span><span class="s2">));</span>
+        <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">setDefaultCloseOperation</span><span class="s2">(</span><span class="s1">EXIT_ON_CLOSE</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s1">JFrame cc_frame</span><span class="s2">;</span>
+    <span class="s1">JLabel name</span><span class="s2">, </span><span class="s1">payment_method</span><span class="s2">, </span><span class="s1">current_balance</span><span class="s2">, </span><span class="s1">account_lb</span><span class="s2">, </span><span class="s1">mobile_lb</span><span class="s2">, </span><span class="s1">lb_sent_amount</span><span class="s2">, </span><span class="s1">lb_receiver</span><span class="s2">;</span>
+    <span class="s1">JTextField sent_amount</span><span class="s2">, </span><span class="s1">receiver</span><span class="s2">;</span>
+    <span class="s1">JButton pay</span><span class="s2">;</span>
+    <span class="s1">String balance</span><span class="s2">;</span>
+
+    <span class="s0">public void </span><span class="s1">payment_credit_card</span><span class="s2">() {</span>
+        <span class="s1">Border line </span><span class="s2">= </span><span class="s1">BorderFactory</span><span class="s2">.</span><span class="s1">createLineBorder</span><span class="s2">(</span><span class="s1">black</span><span class="s2">, </span><span class="s4">2</span><span class="s2">);</span>
+        <span class="s1">cc_frame </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JFrame</span><span class="s2">(</span><span class="s3">&quot;Payment gateway&quot;</span><span class="s2">);</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">setSize</span><span class="s2">(</span><span class="s4">480</span><span class="s2">, </span><span class="s4">550</span><span class="s2">);</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">setLayout</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">setIconImage</span><span class="s2">(</span><span class="s0">new </span><span class="s1">ImageIcon</span><span class="s2">(</span><span class="s3">&quot;src/credit-cards.png&quot;</span><span class="s2">).</span><span class="s1">getImage</span><span class="s2">());</span>
+
+        <span class="s1">name </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;welcome &quot; </span><span class="s2">+ </span><span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">() + </span><span class="s3">&quot;!&quot;</span><span class="s2">);</span>
+        <span class="s1">name</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Serif&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">BOLD</span><span class="s2">, </span><span class="s4">28</span><span class="s2">));</span>
+        <span class="s1">name</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">name</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">30</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">25</span><span class="s2">);</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">name</span><span class="s2">);</span>
+
+        <span class="s1">payment_method </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Payment Method : Credit card&quot;</span><span class="s2">);</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">payment_method</span><span class="s2">);</span>
+        <span class="s1">payment_method</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">80</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">payment_method</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">payment_method</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+
+        <span class="s1">current_balance </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">();</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">current_balance</span><span class="s2">);</span>
+        <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">130</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+
+        <span class="s1">account_lb </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">();</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">account_lb</span><span class="s2">);</span>
+        <span class="s1">account_lb</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">180</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">account_lb</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">account_lb</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+
+        <span class="s1">mobile_lb </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">();</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">mobile_lb</span><span class="s2">);</span>
+        <span class="s1">mobile_lb</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">230</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">mobile_lb</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">mobile_lb</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">String username </span><span class="s2">= </span><span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">();</span>
+
+        <span class="s1">lb_sent_amount </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Transfer Amount&quot;</span><span class="s2">);</span>
+        <span class="s1">lb_sent_amount</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_sent_amount</span><span class="s2">);</span>
+        <span class="s1">lb_sent_amount</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">lb_sent_amount</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">280</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">sent_amount </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">();</span>
+        <span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">190</span><span class="s2">, </span><span class="s4">285</span><span class="s2">, </span><span class="s4">220</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">16</span><span class="s2">));</span>
+        <span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">line</span><span class="s2">);</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">sent_amount</span><span class="s2">);</span>
+        <span class="s1">lb_sent_amount</span><span class="s2">.</span><span class="s1">addKeyListener</span><span class="s2">(</span><span class="s0">new </span><span class="s1">KeyAdapter</span><span class="s2">() {</span>
+            <span class="s0">public void </span><span class="s1">keyTyped</span><span class="s2">(</span><span class="s1">KeyEvent e</span><span class="s2">) {</span>
+                <span class="s0">char </span><span class="s1">c </span><span class="s2">= </span><span class="s1">e</span><span class="s2">.</span><span class="s1">getKeyChar</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(((</span><span class="s1">c </span><span class="s2">&lt; </span><span class="s3">'0'</span><span class="s2">) || (</span><span class="s1">c </span><span class="s2">&gt; </span><span class="s3">'9'</span><span class="s2">))</span>
+                        <span class="s2">&amp;&amp; (</span><span class="s1">c </span><span class="s2">!= </span><span class="s3">'</span><span class="s0">\b</span><span class="s3">'</span><span class="s2">)) {</span>
+                    <span class="s1">e</span><span class="s2">.</span><span class="s1">consume</span><span class="s2">();</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+
+        <span class="s2">});</span>
+
+        <span class="s1">lb_receiver </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Recipient Username&quot;</span><span class="s2">);</span>
+        <span class="s1">lb_receiver</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">340</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">lb_receiver</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_receiver</span><span class="s2">);</span>
+        <span class="s1">lb_receiver</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">receiver </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">();</span>
+        <span class="s1">receiver</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">16</span><span class="s2">));</span>
+        <span class="s1">receiver</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">190</span><span class="s2">, </span><span class="s4">345</span><span class="s2">, </span><span class="s4">220</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">receiver</span><span class="s2">);</span>
+        <span class="s1">receiver</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">line</span><span class="s2">);</span>
+
+        <span class="s1">pay </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JButton</span><span class="s2">(</span><span class="s3">&quot;Pay&quot;</span><span class="s2">);</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">pay</span><span class="s2">);</span>
+        <span class="s1">pay</span><span class="s2">.</span><span class="s1">addActionListener</span><span class="s2">(</span><span class="s0">this</span><span class="s2">);</span>
+        <span class="s1">pay</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">150</span><span class="s2">, </span><span class="s4">420</span><span class="s2">, </span><span class="s4">140</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">pay</span><span class="s2">.</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s4">42</span><span class="s2">, </span><span class="s4">83</span><span class="s2">, </span><span class="s4">255</span><span class="s2">));</span>
+        <span class="s1">pay</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">BOLD</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">pay</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">Border pa </span><span class="s2">= </span><span class="s1">BorderFactory</span><span class="s2">.</span><span class="s1">createLineBorder</span><span class="s2">(</span><span class="s1">white</span><span class="s2">, </span><span class="s4">2</span><span class="s2">);</span>
+        <span class="s1">pay</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">pa</span><span class="s2">);</span>
+        <span class="s1">pay</span><span class="s2">.</span><span class="s1">setCursor</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Cursor</span><span class="s2">(</span><span class="s1">Cursor</span><span class="s2">.</span><span class="s1">HAND_CURSOR</span><span class="s2">));</span>
+
+
+        <span class="s0">try </span><span class="s2">{</span>
+            <span class="s1">Class</span><span class="s2">.</span><span class="s1">forName</span><span class="s2">(</span><span class="s3">&quot;com.mysql.cj.jdbc.Driver&quot;</span><span class="s2">);</span>
+            <span class="s1">Connection con </span><span class="s2">= </span><span class="s1">DriverManager</span><span class="s2">.</span><span class="s1">getConnection</span><span class="s2">(</span><span class="s1">DB_URL</span><span class="s2">, </span><span class="s1">DB_USER</span><span class="s2">, </span><span class="s1">DB_PASSWORD</span><span class="s2">);</span>
+            <span class="s1">PreparedStatement smt </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s3">&quot;SELECT amount, account, mobile FROM users WHERE username = ?&quot;</span><span class="s2">);</span>
+            <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">username</span><span class="s2">);</span>
+
+            <span class="s1">ResultSet r </span><span class="s2">= </span><span class="s1">smt</span><span class="s2">.</span><span class="s1">executeQuery</span><span class="s2">();</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">r</span><span class="s2">.</span><span class="s1">next</span><span class="s2">()) {</span>
+                <span class="s1">balance </span><span class="s2">= </span><span class="s1">r</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;amount&quot;</span><span class="s2">);</span>
+                <span class="s1">String account_no </span><span class="s2">= </span><span class="s1">r</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;account&quot;</span><span class="s2">);</span>
+                <span class="s1">String mobile_no </span><span class="s2">= </span><span class="s1">r</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;mobile&quot;</span><span class="s2">);</span>
+                <span class="s1">account_lb</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Account Number :  &quot; </span><span class="s2">+ </span><span class="s1">account_no</span><span class="s2">);</span>
+                <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Current Balance :  ₹&quot; </span><span class="s2">+ </span><span class="s1">balance</span><span class="s2">);</span>
+                <span class="s1">mobile_lb</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Mobile Number :  &quot; </span><span class="s2">+ </span><span class="s1">mobile_no</span><span class="s2">);</span>
+            <span class="s2">}</span>
+
+
+            <span class="s1">r</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+            <span class="s1">smt</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+            <span class="s1">con</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+
+        <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">ClassNotFoundException </span><span class="s2">| </span><span class="s1">SQLException e</span><span class="s2">) {</span>
+            <span class="s1">e</span><span class="s2">.</span><span class="s1">printStackTrace</span><span class="s2">();</span>
+            <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Error loading balance&quot;</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">setLocationRelativeTo</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">setVisible</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">getContentPane</span><span class="s2">().</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">0xFF361049</span><span class="s2">, </span><span class="s0">true</span><span class="s2">));</span>
+        <span class="s1">cc_frame</span><span class="s2">.</span><span class="s1">setDefaultCloseOperation</span><span class="s2">(</span><span class="s1">JFrame</span><span class="s2">.</span><span class="s1">EXIT_ON_CLOSE</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s1">JFrame pb_frame</span><span class="s2">;</span>
+    <span class="s1">JLabel email_lb</span><span class="s2">;</span>
+    <span class="s1">JTextField receiver_email</span><span class="s2">;</span>
+    <span class="s1">JButton pay_pal</span><span class="s2">;</span>
+
+    <span class="s0">public void </span><span class="s1">setPaypal</span><span class="s2">() {</span>
+        <span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s3">&quot;Pay button clicked!&quot;</span><span class="s2">);</span>
+        <span class="s1">Border line </span><span class="s2">= </span><span class="s1">BorderFactory</span><span class="s2">.</span><span class="s1">createLineBorder</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">243</span><span class="s2">, </span><span class="s4">146</span><span class="s2">, </span><span class="s4">3</span><span class="s2">), </span><span class="s4">3</span><span class="s2">);</span>
+        <span class="s1">pb_frame </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JFrame</span><span class="s2">(</span><span class="s3">&quot;Payment gateway&quot;</span><span class="s2">);</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">setSize</span><span class="s2">(</span><span class="s4">480</span><span class="s2">, </span><span class="s4">550</span><span class="s2">);</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">setLayout</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">setIconImage</span><span class="s2">(</span><span class="s0">new </span><span class="s1">ImageIcon</span><span class="s2">(</span><span class="s3">&quot;src/credit-cards.png&quot;</span><span class="s2">).</span><span class="s1">getImage</span><span class="s2">());</span>
+
+        <span class="s1">name </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;welcome &quot; </span><span class="s2">+ </span><span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">() + </span><span class="s3">&quot;!&quot;</span><span class="s2">);</span>
+        <span class="s1">name</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Serif&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">BOLD</span><span class="s2">, </span><span class="s4">28</span><span class="s2">));</span>
+        <span class="s1">name</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">name</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">30</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">25</span><span class="s2">);</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">name</span><span class="s2">);</span>
+
+        <span class="s1">payment_method </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Payment Method : PayPal&quot;</span><span class="s2">);</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">payment_method</span><span class="s2">);</span>
+        <span class="s1">payment_method</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">80</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">payment_method</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">payment_method</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+
+        <span class="s1">current_balance </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">();</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">current_balance</span><span class="s2">);</span>
+        <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">130</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+
+        <span class="s1">account_lb </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">();</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">account_lb</span><span class="s2">);</span>
+        <span class="s1">account_lb</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">180</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">account_lb</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">account_lb</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+
+        <span class="s1">email_lb </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">();</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">email_lb</span><span class="s2">);</span>
+        <span class="s1">email_lb</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">230</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">email_lb</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">email_lb</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+
+        <span class="s1">String username </span><span class="s2">= </span><span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">();</span>
+
+        <span class="s1">lb_sent_amount </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Transfer Amount&quot;</span><span class="s2">);</span>
+        <span class="s1">lb_sent_amount</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_sent_amount</span><span class="s2">);</span>
+        <span class="s1">lb_sent_amount</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">lb_sent_amount</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">280</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+
+        <span class="s1">sent_amount </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">();</span>
+        <span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">190</span><span class="s2">, </span><span class="s4">285</span><span class="s2">, </span><span class="s4">220</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">16</span><span class="s2">));</span>
+        <span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">line</span><span class="s2">);</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">sent_amount</span><span class="s2">);</span>
+
+        <span class="s1">lb_sent_amount</span><span class="s2">.</span><span class="s1">addKeyListener</span><span class="s2">(</span><span class="s0">new </span><span class="s1">KeyAdapter</span><span class="s2">() {</span>
+            <span class="s0">public void </span><span class="s1">keyTyped</span><span class="s2">(</span><span class="s1">KeyEvent e</span><span class="s2">) {</span>
+                <span class="s0">char </span><span class="s1">c </span><span class="s2">= </span><span class="s1">e</span><span class="s2">.</span><span class="s1">getKeyChar</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(((</span><span class="s1">c </span><span class="s2">&lt; </span><span class="s3">'0'</span><span class="s2">) || (</span><span class="s1">c </span><span class="s2">&gt; </span><span class="s3">'9'</span><span class="s2">)) &amp;&amp; (</span><span class="s1">c </span><span class="s2">!= </span><span class="s3">'</span><span class="s0">\b</span><span class="s3">'</span><span class="s2">)) {</span>
+                    <span class="s1">e</span><span class="s2">.</span><span class="s1">consume</span><span class="s2">();</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+        <span class="s2">});</span>
+
+        <span class="s1">lb_receiver </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Recipient Email id&quot;</span><span class="s2">);</span>
+        <span class="s1">lb_receiver</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">340</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">lb_receiver</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_receiver</span><span class="s2">);</span>
+        <span class="s1">lb_receiver</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+
+        <span class="s1">receiver_email </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">();</span>
+        <span class="s1">receiver_email</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">16</span><span class="s2">));</span>
+        <span class="s1">receiver_email</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">190</span><span class="s2">, </span><span class="s4">345</span><span class="s2">, </span><span class="s4">220</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">receiver_email</span><span class="s2">);</span>
+        <span class="s1">receiver_email</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">line</span><span class="s2">);</span>
+
+        <span class="s1">pay_pal </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JButton</span><span class="s2">(</span><span class="s3">&quot;Pay&quot;</span><span class="s2">);</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">pay_pal</span><span class="s2">);</span>
+        <span class="s1">pay_pal</span><span class="s2">.</span><span class="s1">addActionListener</span><span class="s2">(</span><span class="s0">this</span><span class="s2">);</span>
+        <span class="s1">pay_pal</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">150</span><span class="s2">, </span><span class="s4">420</span><span class="s2">, </span><span class="s4">140</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">pay_pal</span><span class="s2">.</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s4">42</span><span class="s2">, </span><span class="s4">83</span><span class="s2">, </span><span class="s4">255</span><span class="s2">));</span>
+        <span class="s1">pay_pal</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">BOLD</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">pay_pal</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">Border pa </span><span class="s2">= </span><span class="s1">BorderFactory</span><span class="s2">.</span><span class="s1">createLineBorder</span><span class="s2">(</span><span class="s1">white</span><span class="s2">, </span><span class="s4">2</span><span class="s2">);</span>
+        <span class="s1">pay_pal</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">pa</span><span class="s2">);</span>
+        <span class="s1">pay_pal</span><span class="s2">.</span><span class="s1">setCursor</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Cursor</span><span class="s2">(</span><span class="s1">Cursor</span><span class="s2">.</span><span class="s1">HAND_CURSOR</span><span class="s2">));</span>
+        <span class="s0">try </span><span class="s2">{</span>
+            <span class="s1">Class</span><span class="s2">.</span><span class="s1">forName</span><span class="s2">(</span><span class="s3">&quot;com.mysql.cj.jdbc.Driver&quot;</span><span class="s2">);</span>
+            <span class="s1">Connection con </span><span class="s2">= </span><span class="s1">DriverManager</span><span class="s2">.</span><span class="s1">getConnection</span><span class="s2">(</span><span class="s1">DB_URL</span><span class="s2">, </span><span class="s1">DB_USER</span><span class="s2">, </span><span class="s1">DB_PASSWORD</span><span class="s2">);</span>
+            <span class="s1">PreparedStatement smt </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s3">&quot;SELECT amount, account, email FROM users WHERE username = ?&quot;</span><span class="s2">);</span>
+            <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">username</span><span class="s2">);</span>
+
+            <span class="s1">ResultSet r </span><span class="s2">= </span><span class="s1">smt</span><span class="s2">.</span><span class="s1">executeQuery</span><span class="s2">();</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">r</span><span class="s2">.</span><span class="s1">next</span><span class="s2">()) {</span>
+                <span class="s1">balance </span><span class="s2">= </span><span class="s1">r</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;amount&quot;</span><span class="s2">);</span>
+                <span class="s1">String account_no </span><span class="s2">= </span><span class="s1">r</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;account&quot;</span><span class="s2">);</span>
+                <span class="s1">String email </span><span class="s2">= </span><span class="s1">r</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;email&quot;</span><span class="s2">);</span>
+                <span class="s1">account_lb</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Account Number :  &quot; </span><span class="s2">+ </span><span class="s1">account_no</span><span class="s2">);</span>
+                <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Current Balance :  ₹&quot; </span><span class="s2">+ </span><span class="s1">balance</span><span class="s2">);</span>
+                <span class="s1">email_lb</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Email Id :  &quot; </span><span class="s2">+ </span><span class="s1">email</span><span class="s2">);</span>
+            <span class="s2">}</span>
+
+
+            <span class="s1">r</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+            <span class="s1">smt</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+            <span class="s1">con</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+
+        <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">ClassNotFoundException </span><span class="s2">| </span><span class="s1">SQLException e</span><span class="s2">) {</span>
+            <span class="s1">e</span><span class="s2">.</span><span class="s1">printStackTrace</span><span class="s2">();</span>
+            <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Error loading balance&quot;</span><span class="s2">);</span>
+        <span class="s2">}</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">setLocationRelativeTo</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">setVisible</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">getContentPane</span><span class="s2">().</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">0xFF361049</span><span class="s2">, </span><span class="s0">true</span><span class="s2">));</span>
+        <span class="s1">pb_frame</span><span class="s2">.</span><span class="s1">setDefaultCloseOperation</span><span class="s2">(</span><span class="s1">JFrame</span><span class="s2">.</span><span class="s1">EXIT_ON_CLOSE</span><span class="s2">);</span>
+
+    <span class="s2">}</span>
+
+    <span class="s1">JFrame bt</span><span class="s2">;</span>
+    <span class="s1">JButton pay_account</span><span class="s2">;</span>
+    <span class="s1">JTextField receiver_account</span><span class="s2">;</span>
+
+    <span class="s0">public void </span><span class="s1">bank_transfer</span><span class="s2">() {</span>
+
+        <span class="s1">Border line </span><span class="s2">= </span><span class="s1">BorderFactory</span><span class="s2">.</span><span class="s1">createLineBorder</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">243</span><span class="s2">, </span><span class="s4">146</span><span class="s2">, </span><span class="s4">3</span><span class="s2">), </span><span class="s4">3</span><span class="s2">);</span>
+        <span class="s1">bt </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JFrame</span><span class="s2">(</span><span class="s3">&quot;Payment gateway&quot;</span><span class="s2">);</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">setSize</span><span class="s2">(</span><span class="s4">480</span><span class="s2">, </span><span class="s4">550</span><span class="s2">);</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">setLayout</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">setIconImage</span><span class="s2">(</span><span class="s0">new </span><span class="s1">ImageIcon</span><span class="s2">(</span><span class="s3">&quot;src/credit-cards.png&quot;</span><span class="s2">).</span><span class="s1">getImage</span><span class="s2">());</span>
+
+        <span class="s1">name </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;welcome &quot; </span><span class="s2">+ </span><span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">() + </span><span class="s3">&quot;!&quot;</span><span class="s2">);</span>
+        <span class="s1">name</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Serif&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">BOLD</span><span class="s2">, </span><span class="s4">28</span><span class="s2">));</span>
+        <span class="s1">name</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">name</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">30</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">25</span><span class="s2">);</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">name</span><span class="s2">);</span>
+
+        <span class="s1">payment_method </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Payment Method : Bank Transfer&quot;</span><span class="s2">);</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">payment_method</span><span class="s2">);</span>
+        <span class="s1">payment_method</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">80</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">payment_method</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">payment_method</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+
+        <span class="s1">current_balance </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">();</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">current_balance</span><span class="s2">);</span>
+        <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">130</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+
+        <span class="s1">account_lb </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">();</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">account_lb</span><span class="s2">);</span>
+        <span class="s1">account_lb</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">180</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">account_lb</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">account_lb</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+
+        <span class="s1">email_lb </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">();</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">email_lb</span><span class="s2">);</span>
+        <span class="s1">email_lb</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">230</span><span class="s2">, </span><span class="s4">300</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">email_lb</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">email_lb</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+
+        <span class="s1">String username </span><span class="s2">= </span><span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">();</span>
+
+        <span class="s1">lb_sent_amount </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Transfer Amount&quot;</span><span class="s2">);</span>
+        <span class="s1">lb_sent_amount</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_sent_amount</span><span class="s2">);</span>
+        <span class="s1">lb_sent_amount</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">lb_sent_amount</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">280</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+
+        <span class="s1">sent_amount </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">();</span>
+        <span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">210</span><span class="s2">, </span><span class="s4">285</span><span class="s2">, </span><span class="s4">220</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">16</span><span class="s2">));</span>
+        <span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">line</span><span class="s2">);</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">sent_amount</span><span class="s2">);</span>
+
+        <span class="s1">lb_sent_amount</span><span class="s2">.</span><span class="s1">addKeyListener</span><span class="s2">(</span><span class="s0">new </span><span class="s1">KeyAdapter</span><span class="s2">() {</span>
+            <span class="s0">public void </span><span class="s1">keyTyped</span><span class="s2">(</span><span class="s1">KeyEvent e</span><span class="s2">) {</span>
+                <span class="s0">char </span><span class="s1">c </span><span class="s2">= </span><span class="s1">e</span><span class="s2">.</span><span class="s1">getKeyChar</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(((</span><span class="s1">c </span><span class="s2">&lt; </span><span class="s3">'0'</span><span class="s2">) || (</span><span class="s1">c </span><span class="s2">&gt; </span><span class="s3">'9'</span><span class="s2">)) &amp;&amp; (</span><span class="s1">c </span><span class="s2">!= </span><span class="s3">'</span><span class="s0">\b</span><span class="s3">'</span><span class="s2">)) {</span>
+                    <span class="s1">e</span><span class="s2">.</span><span class="s1">consume</span><span class="s2">();</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+        <span class="s2">});</span>
+
+        <span class="s1">lb_receiver </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s3">&quot;Recipient Account No:&quot;</span><span class="s2">);</span>
+        <span class="s1">lb_receiver</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">20</span><span class="s2">, </span><span class="s4">340</span><span class="s2">, </span><span class="s4">200</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">lb_receiver</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">lb_receiver</span><span class="s2">);</span>
+        <span class="s1">lb_receiver</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+
+        <span class="s1">receiver_account </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">();</span>
+        <span class="s1">receiver_account</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s4">16</span><span class="s2">));</span>
+        <span class="s1">receiver_account</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">210</span><span class="s2">, </span><span class="s4">345</span><span class="s2">, </span><span class="s4">220</span><span class="s2">, </span><span class="s4">30</span><span class="s2">);</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">receiver_account</span><span class="s2">);</span>
+        <span class="s1">receiver_account</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">line</span><span class="s2">);</span>
+
+        <span class="s1">pay_account </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JButton</span><span class="s2">(</span><span class="s3">&quot;Pay&quot;</span><span class="s2">);</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">pay_account</span><span class="s2">);</span>
+        <span class="s1">pay_account</span><span class="s2">.</span><span class="s1">addActionListener</span><span class="s2">(</span><span class="s0">this</span><span class="s2">);</span>
+        <span class="s1">pay_account</span><span class="s2">.</span><span class="s1">setBounds</span><span class="s2">(</span><span class="s4">150</span><span class="s2">, </span><span class="s4">420</span><span class="s2">, </span><span class="s4">140</span><span class="s2">, </span><span class="s4">40</span><span class="s2">);</span>
+        <span class="s1">pay_account</span><span class="s2">.</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s4">42</span><span class="s2">, </span><span class="s4">83</span><span class="s2">, </span><span class="s4">255</span><span class="s2">));</span>
+        <span class="s1">pay_account</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s3">&quot;&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">BOLD</span><span class="s2">, </span><span class="s4">18</span><span class="s2">));</span>
+        <span class="s1">pay_account</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">white</span><span class="s2">);</span>
+        <span class="s1">Border pa </span><span class="s2">= </span><span class="s1">BorderFactory</span><span class="s2">.</span><span class="s1">createLineBorder</span><span class="s2">(</span><span class="s1">white</span><span class="s2">, </span><span class="s4">2</span><span class="s2">);</span>
+        <span class="s1">pay_account</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">pa</span><span class="s2">);</span>
+        <span class="s1">pay_account</span><span class="s2">.</span><span class="s1">setCursor</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Cursor</span><span class="s2">(</span><span class="s1">Cursor</span><span class="s2">.</span><span class="s1">HAND_CURSOR</span><span class="s2">));</span>
+
+        <span class="s0">try </span><span class="s2">{</span>
+            <span class="s1">Class</span><span class="s2">.</span><span class="s1">forName</span><span class="s2">(</span><span class="s3">&quot;com.mysql.cj.jdbc.Driver&quot;</span><span class="s2">);</span>
+            <span class="s1">Connection con </span><span class="s2">= </span><span class="s1">DriverManager</span><span class="s2">.</span><span class="s1">getConnection</span><span class="s2">(</span><span class="s1">DB_URL</span><span class="s2">, </span><span class="s1">DB_USER</span><span class="s2">, </span><span class="s1">DB_PASSWORD</span><span class="s2">);</span>
+            <span class="s1">PreparedStatement smt </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s3">&quot;SELECT amount, account, email FROM users WHERE username = ?&quot;</span><span class="s2">);</span>
+            <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">username</span><span class="s2">);</span>
+
+            <span class="s1">ResultSet r </span><span class="s2">= </span><span class="s1">smt</span><span class="s2">.</span><span class="s1">executeQuery</span><span class="s2">();</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">r</span><span class="s2">.</span><span class="s1">next</span><span class="s2">()) {</span>
+                <span class="s1">balance </span><span class="s2">= </span><span class="s1">r</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;amount&quot;</span><span class="s2">);</span>
+                <span class="s1">String account_no </span><span class="s2">= </span><span class="s1">r</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;account&quot;</span><span class="s2">);</span>
+                <span class="s1">String email </span><span class="s2">= </span><span class="s1">r</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;email&quot;</span><span class="s2">);</span>
+                <span class="s1">account_lb</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Account Number :  &quot; </span><span class="s2">+ </span><span class="s1">account_no</span><span class="s2">);</span>
+                <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Current Balance :  ₹&quot; </span><span class="s2">+ </span><span class="s1">balance</span><span class="s2">);</span>
+                <span class="s1">email_lb</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Email Id :  &quot; </span><span class="s2">+ </span><span class="s1">email</span><span class="s2">);</span>
+            <span class="s2">}</span>
+
+            <span class="s1">r</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+            <span class="s1">smt</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+            <span class="s1">con</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+
+        <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">ClassNotFoundException </span><span class="s2">| </span><span class="s1">SQLException e</span><span class="s2">) {</span>
+            <span class="s1">e</span><span class="s2">.</span><span class="s1">printStackTrace</span><span class="s2">();</span>
+            <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Error loading balance&quot;</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">setLocationRelativeTo</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">setVisible</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">getContentPane</span><span class="s2">().</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s4">0xFF361049</span><span class="s2">, </span><span class="s0">true</span><span class="s2">));</span>
+        <span class="s1">bt</span><span class="s2">.</span><span class="s1">setDefaultCloseOperation</span><span class="s2">(</span><span class="s1">JFrame</span><span class="s2">.</span><span class="s1">EXIT_ON_CLOSE</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">actionPerformed</span><span class="s2">(</span><span class="s1">ActionEvent e</span><span class="s2">) {</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">e</span><span class="s2">.</span><span class="s1">getSource</span><span class="s2">() == </span><span class="s1">loginButton</span><span class="s2">) {</span>
+            <span class="s1">String name </span><span class="s2">= </span><span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">();</span>
+            <span class="s0">char</span><span class="s2">[] </span><span class="s1">password </span><span class="s2">= </span><span class="s1">pass_word</span><span class="s2">.</span><span class="s1">getPassword</span><span class="s2">();</span>
+            <span class="s0">try </span><span class="s2">{</span>
+                <span class="s1">Class</span><span class="s2">.</span><span class="s1">forName</span><span class="s2">(</span><span class="s3">&quot;com.mysql.cj.jdbc.Driver&quot;</span><span class="s2">);</span>
+                <span class="s1">Connection con </span><span class="s2">= </span><span class="s1">DriverManager</span><span class="s2">.</span><span class="s1">getConnection</span><span class="s2">(</span><span class="s1">DB_URL</span><span class="s2">, </span><span class="s1">DB_USER</span><span class="s2">, </span><span class="s1">DB_PASSWORD</span><span class="s2">);</span>
+                <span class="s1">String sql </span><span class="s2">= </span><span class="s3">&quot;SELECT * FROM users WHERE username=? AND password=?&quot;</span><span class="s2">;</span>
+                <span class="s1">PreparedStatement smt </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s1">sql</span><span class="s2">);</span>
+                <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">name</span><span class="s2">);</span>
+                <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">2</span><span class="s2">, </span><span class="s0">new </span><span class="s1">String</span><span class="s2">(</span><span class="s1">password</span><span class="s2">));</span>
+
+                <span class="s1">ResultSet rs </span><span class="s2">= </span><span class="s1">smt</span><span class="s2">.</span><span class="s1">executeQuery</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">rs</span><span class="s2">.</span><span class="s1">next</span><span class="s2">()) {</span>
+
+                    <span class="s1">f</span><span class="s2">.</span><span class="s1">dispose</span><span class="s2">();</span>
+                    <span class="s1">login</span><span class="s2">();</span>
+                <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot; Invalid username or password.&quot;</span><span class="s2">);</span>
+                <span class="s2">}</span>
+
+                <span class="s1">con</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+
+            <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">ClassNotFoundException </span><span class="s2">| </span><span class="s1">SQLException ex</span><span class="s2">) {</span>
+                <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Error: &quot; </span><span class="s2">+ </span><span class="s1">ex</span><span class="s2">.</span><span class="s1">getMessage</span><span class="s2">());</span>
+                <span class="s0">throw new </span><span class="s1">RuntimeException</span><span class="s2">(</span><span class="s1">ex</span><span class="s2">);</span>
+
+            <span class="s2">}</span>
+
+
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">e</span><span class="s2">.</span><span class="s1">getSource</span><span class="s2">() == </span><span class="s1">registerButton</span><span class="s2">) {</span>
+            <span class="s1">f</span><span class="s2">.</span><span class="s1">dispose</span><span class="s2">();</span>
+            <span class="s1">register</span><span class="s2">();</span>
+
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">e</span><span class="s2">.</span><span class="s1">getSource</span><span class="s2">() == </span><span class="s1">sign_up</span><span class="s2">) {</span>
+            <span class="s1">String name </span><span class="s2">= </span><span class="s1">rg_tf_user_name</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">();</span>
+            <span class="s1">String email </span><span class="s2">= </span><span class="s1">tf_email</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">();</span>
+            <span class="s1">String mobile </span><span class="s2">= </span><span class="s1">tf_mobile_no</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">();</span>
+            <span class="s1">String amount_str </span><span class="s2">= </span><span class="s1">tf_amount</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">();</span>
+            <span class="s1">String account </span><span class="s2">= </span><span class="s1">tf_account_no</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">();</span>
+
+            <span class="s0">char</span><span class="s2">[] </span><span class="s1">pass_word </span><span class="s2">= </span><span class="s1">rg_password</span><span class="s2">.</span><span class="s1">getPassword</span><span class="s2">();</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">name</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">() || </span><span class="s1">pass_word</span><span class="s2">.</span><span class="s1">length </span><span class="s2">== </span><span class="s4">0 </span><span class="s2">|| </span><span class="s1">email</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">() || </span><span class="s1">mobile</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">() || </span><span class="s1">amount_str</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">()) {</span>
+                <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Please fill all the fields&quot;</span><span class="s2">);</span>
+            <span class="s2">} </span><span class="s0">else if </span><span class="s2">(!</span><span class="s1">email</span><span class="s2">.</span><span class="s1">matches</span><span class="s2">(</span><span class="s3">&quot;^[</span><span class="s0">\\</span><span class="s3">w.-]+@[</span><span class="s0">\\</span><span class="s3">w.-]+</span><span class="s0">\\</span><span class="s3">.</span><span class="s0">\\</span><span class="s3">w+$&quot;</span><span class="s2">)) {</span>
+                <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Invalid email address&quot;</span><span class="s2">);</span>
+
+            <span class="s2">} </span><span class="s0">else if </span><span class="s2">(!</span><span class="s1">mobile</span><span class="s2">.</span><span class="s1">matches</span><span class="s2">(</span><span class="s3">&quot;</span><span class="s0">\\</span><span class="s3">d{10}&quot;</span><span class="s2">)) {</span>
+                <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Mobile number must be 10 digits&quot;</span><span class="s2">);</span>
+
+            <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                <span class="s0">try </span><span class="s2">{</span>
+                    <span class="s0">int </span><span class="s1">amount </span><span class="s2">= </span><span class="s1">Integer</span><span class="s2">.</span><span class="s1">parseInt</span><span class="s2">(</span><span class="s1">amount_str</span><span class="s2">);</span>
+                    <span class="s1">Class</span><span class="s2">.</span><span class="s1">forName</span><span class="s2">(</span><span class="s3">&quot;com.mysql.cj.jdbc.Driver&quot;</span><span class="s2">);</span>
+                    <span class="s1">Connection con </span><span class="s2">= </span><span class="s1">DriverManager</span><span class="s2">.</span><span class="s1">getConnection</span><span class="s2">(</span><span class="s1">DB_URL</span><span class="s2">, </span><span class="s1">DB_USER</span><span class="s2">, </span><span class="s1">DB_PASSWORD</span><span class="s2">);</span>
+                    <span class="s1">String sql </span><span class="s2">= </span><span class="s3">&quot;INSERT INTO users(username,password,email,mobile,amount,account) VALUES (?,?,?,?,?,?)&quot;</span><span class="s2">;</span>
+                    <span class="s1">PreparedStatement smt </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s1">sql</span><span class="s2">);</span>
+                    <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">name</span><span class="s2">);</span>
+                    <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">2</span><span class="s2">, </span><span class="s0">new </span><span class="s1">String</span><span class="s2">(</span><span class="s1">pass_word</span><span class="s2">));</span>
+                    <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">3</span><span class="s2">, </span><span class="s1">email</span><span class="s2">);</span>
+                    <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">4</span><span class="s2">, </span><span class="s1">mobile</span><span class="s2">);</span>
+                    <span class="s1">smt</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s4">5</span><span class="s2">, </span><span class="s1">amount</span><span class="s2">);</span>
+                    <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">6</span><span class="s2">, </span><span class="s1">account</span><span class="s2">);</span>
+                    <span class="s1">smt</span><span class="s2">.</span><span class="s1">executeUpdate</span><span class="s2">();</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;done&quot;</span><span class="s2">);</span>
+                    <span class="s1">con</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+                    <span class="s1">f_register</span><span class="s2">.</span><span class="s1">dispose</span><span class="s2">();</span>
+                    <span class="s0">new </span><span class="s1">Payment</span><span class="s2">();</span>
+                <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">ClassNotFoundException ex</span><span class="s2">) {</span>
+                    <span class="s0">throw new </span><span class="s1">RuntimeException</span><span class="s2">(</span><span class="s1">ex</span><span class="s2">);</span>
+                <span class="s2">}</span><span class="s0">catch </span><span class="s2">(</span><span class="s1">SQLException dupEx</span><span class="s2">) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Username or email or Account  already exists!&quot;</span><span class="s2">);</span>
+                <span class="s2">}</span>
+
+            <span class="s2">}</span>
+
+
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">e</span><span class="s2">.</span><span class="s1">getSource</span><span class="s2">() == </span><span class="s1">resetButton</span><span class="s2">) {</span>
+            <span class="s1">f</span><span class="s2">.</span><span class="s1">dispose</span><span class="s2">();</span>
+
+            <span class="s0">new </span><span class="s1">Payment</span><span class="s2">();</span>
+
+
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">e</span><span class="s2">.</span><span class="s1">getSource</span><span class="s2">() == </span><span class="s1">credit_card</span><span class="s2">) {</span>
+            <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">dispose</span><span class="s2">();</span>
+            <span class="s1">payment_credit_card</span><span class="s2">();</span>
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">e</span><span class="s2">.</span><span class="s1">getSource</span><span class="s2">() == </span><span class="s1">pay</span><span class="s2">) {</span>
+            <span class="s1">String sender_amount </span><span class="s2">= </span><span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">();</span>
+            <span class="s1">String receiver_user </span><span class="s2">= </span><span class="s1">receiver</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">();</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">sender_amount</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">() || </span><span class="s1">receiver_user</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">()) {</span>
+                <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Please fill all fields&quot;</span><span class="s2">);</span>
+            <span class="s2">}</span>
+            <span class="s0">try </span><span class="s2">{</span>
+                <span class="s0">int </span><span class="s1">sendAmountValue </span><span class="s2">= </span><span class="s1">Integer</span><span class="s2">.</span><span class="s1">parseInt</span><span class="s2">(</span><span class="s1">sender_amount</span><span class="s2">);</span>
+                <span class="s0">int </span><span class="s1">currentBalance </span><span class="s2">= </span><span class="s1">Integer</span><span class="s2">.</span><span class="s1">parseInt</span><span class="s2">(</span><span class="s1">balance</span><span class="s2">);</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">sendAmountValue </span><span class="s2">&lt; </span><span class="s4">0</span><span class="s2">) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Value must be greater than 0&quot;</span><span class="s2">);</span>
+                    <span class="s0">return</span><span class="s2">;</span>
+                <span class="s2">}</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">sendAmountValue </span><span class="s2">&gt; </span><span class="s1">currentBalance</span><span class="s2">) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Insufficient balance&quot;</span><span class="s2">);</span>
+                    <span class="s0">return</span><span class="s2">;</span>
+                <span class="s2">}</span>
+                <span class="s0">int </span><span class="s1">new_balance </span><span class="s2">= </span><span class="s1">currentBalance </span><span class="s2">- </span><span class="s1">sendAmountValue</span><span class="s2">;</span>
+                <span class="s1">Class</span><span class="s2">.</span><span class="s1">forName</span><span class="s2">(</span><span class="s3">&quot;com.mysql.cj.jdbc.Driver&quot;</span><span class="s2">);</span>
+                <span class="s1">Connection con </span><span class="s2">= </span><span class="s1">DriverManager</span><span class="s2">.</span><span class="s1">getConnection</span><span class="s2">(</span><span class="s1">DB_URL</span><span class="s2">, </span><span class="s1">DB_USER</span><span class="s2">, </span><span class="s1">DB_PASSWORD</span><span class="s2">);</span>
+                <span class="s1">PreparedStatement smt </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s3">&quot;SELECT username FROM users WHERE username = ? &quot;</span><span class="s2">);</span>
+                <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">receiver_user</span><span class="s2">);</span>
+                <span class="s1">ResultSet receiverResult </span><span class="s2">= </span><span class="s1">smt</span><span class="s2">.</span><span class="s1">executeQuery</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(!</span><span class="s1">receiverResult</span><span class="s2">.</span><span class="s1">next</span><span class="s2">()) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Receiver is not found&quot;</span><span class="s2">);</span>
+                    <span class="s1">con</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+                <span class="s2">}</span>
+                <span class="s1">PreparedStatement sender_update </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s3">&quot;UPDATE users SET amount=? WHERE username = ? &quot;</span><span class="s2">);</span>
+                <span class="s1">sender_update</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">new_balance</span><span class="s2">);</span>
+                <span class="s1">sender_update</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">2</span><span class="s2">, </span><span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">());</span>
+                <span class="s1">PreparedStatement receiver_update </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s3">&quot;UPDATE users SET amount = amount+ ? WHERE username = ?&quot;</span><span class="s2">);</span>
+                <span class="s1">receiver_update</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">new_balance</span><span class="s2">);</span>
+                <span class="s1">receiver_update</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">2</span><span class="s2">, </span><span class="s1">receiver_user</span><span class="s2">);</span>
+                <span class="s0">int </span><span class="s1">senderUpdated </span><span class="s2">= </span><span class="s1">sender_update</span><span class="s2">.</span><span class="s1">executeUpdate</span><span class="s2">();</span>
+                <span class="s0">int </span><span class="s1">receiverUpdated </span><span class="s2">= </span><span class="s1">receiver_update</span><span class="s2">.</span><span class="s1">executeUpdate</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">senderUpdated </span><span class="s2">&gt; </span><span class="s4">0 </span><span class="s2">&amp;&amp; </span><span class="s1">receiverUpdated </span><span class="s2">&gt; </span><span class="s4">0</span><span class="s2">) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Payment Successful!&quot;</span><span class="s2">);</span>
+                    <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Current Balance :  ₹&quot; </span><span class="s2">+ </span><span class="s1">new_balance</span><span class="s2">);</span>
+                    <span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;&quot;</span><span class="s2">);</span>
+                    <span class="s1">receiver</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;&quot;</span><span class="s2">);</span>
+                <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Payment Failed&quot;</span><span class="s2">);</span>
+                <span class="s2">}</span>
+
+                <span class="s1">con</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+
+            <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">ClassNotFoundException </span><span class="s2">| </span><span class="s1">SQLException ex</span><span class="s2">) {</span>
+                <span class="s0">throw new </span><span class="s1">RuntimeException</span><span class="s2">(</span><span class="s1">ex</span><span class="s2">);</span>
+            <span class="s2">}</span>
+
+
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">e</span><span class="s2">.</span><span class="s1">getSource</span><span class="s2">() == </span><span class="s1">pay_pal</span><span class="s2">) {</span>
+            <span class="s1">String sender_amount </span><span class="s2">= </span><span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">();</span>
+            <span class="s1">String receiver_mail </span><span class="s2">= </span><span class="s1">receiver_email</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">();</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">sender_amount</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">() || </span><span class="s1">receiver_mail</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">()) {</span>
+                <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Please fill all fields&quot;</span><span class="s2">);</span>
+            <span class="s2">}</span>
+            <span class="s0">try </span><span class="s2">{</span>
+                <span class="s0">int </span><span class="s1">sendAmountValue </span><span class="s2">= </span><span class="s1">Integer</span><span class="s2">.</span><span class="s1">parseInt</span><span class="s2">(</span><span class="s1">sender_amount</span><span class="s2">);</span>
+                <span class="s0">int </span><span class="s1">currentBalance </span><span class="s2">= </span><span class="s1">Integer</span><span class="s2">.</span><span class="s1">parseInt</span><span class="s2">(</span><span class="s1">balance</span><span class="s2">);</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">sendAmountValue </span><span class="s2">&lt; </span><span class="s4">0</span><span class="s2">) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Value must be greater than 0&quot;</span><span class="s2">);</span>
+                    <span class="s0">return</span><span class="s2">;</span>
+                <span class="s2">}</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">sendAmountValue </span><span class="s2">&gt; </span><span class="s1">currentBalance</span><span class="s2">) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Insufficient balance&quot;</span><span class="s2">);</span>
+                    <span class="s0">return</span><span class="s2">;</span>
+                <span class="s2">}</span>
+                <span class="s0">int </span><span class="s1">new_balance </span><span class="s2">= </span><span class="s1">currentBalance </span><span class="s2">- </span><span class="s1">sendAmountValue</span><span class="s2">;</span>
+                <span class="s1">Class</span><span class="s2">.</span><span class="s1">forName</span><span class="s2">(</span><span class="s3">&quot;com.mysql.cj.jdbc.Driver&quot;</span><span class="s2">);</span>
+                <span class="s1">Connection con </span><span class="s2">= </span><span class="s1">DriverManager</span><span class="s2">.</span><span class="s1">getConnection</span><span class="s2">(</span><span class="s1">DB_URL</span><span class="s2">, </span><span class="s1">DB_USER</span><span class="s2">, </span><span class="s1">DB_PASSWORD</span><span class="s2">);</span>
+                <span class="s1">PreparedStatement smt </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s3">&quot;SELECT email FROM users WHERE email = ? &quot;</span><span class="s2">);</span>
+                <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">receiver_mail</span><span class="s2">);</span>
+                <span class="s1">ResultSet receiverResult </span><span class="s2">= </span><span class="s1">smt</span><span class="s2">.</span><span class="s1">executeQuery</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(!</span><span class="s1">receiverResult</span><span class="s2">.</span><span class="s1">next</span><span class="s2">()) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Receiver is not found&quot;</span><span class="s2">);</span>
+                    <span class="s1">con</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+                <span class="s2">}</span>
+                <span class="s1">PreparedStatement sender_update </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s3">&quot;UPDATE users SET amount=? WHERE username = ? &quot;</span><span class="s2">);</span>
+                <span class="s1">sender_update</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">new_balance</span><span class="s2">);</span>
+                <span class="s1">sender_update</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">2</span><span class="s2">, </span><span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">());</span>
+                <span class="s1">PreparedStatement receiver_update </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s3">&quot;UPDATE users SET amount = amount+ ? WHERE email = ?&quot;</span><span class="s2">);</span>
+                <span class="s1">receiver_update</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">new_balance</span><span class="s2">);</span>
+                <span class="s1">receiver_update</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">2</span><span class="s2">, </span><span class="s1">receiver_mail</span><span class="s2">);</span>
+                <span class="s0">int </span><span class="s1">senderUpdated </span><span class="s2">= </span><span class="s1">sender_update</span><span class="s2">.</span><span class="s1">executeUpdate</span><span class="s2">();</span>
+                <span class="s0">int </span><span class="s1">receiverUpdated </span><span class="s2">= </span><span class="s1">receiver_update</span><span class="s2">.</span><span class="s1">executeUpdate</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">senderUpdated </span><span class="s2">&gt; </span><span class="s4">0 </span><span class="s2">&amp;&amp; </span><span class="s1">receiverUpdated </span><span class="s2">&gt; </span><span class="s4">0</span><span class="s2">) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Payment Successful!&quot;</span><span class="s2">);</span>
+                    <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Current Balance :  ₹&quot; </span><span class="s2">+ </span><span class="s1">new_balance</span><span class="s2">);</span>
+                    <span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;&quot;</span><span class="s2">);</span>
+                    <span class="s1">receiver_email</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;&quot;</span><span class="s2">);</span>
+                <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Payment Failed&quot;</span><span class="s2">);</span>
+                <span class="s2">}</span>
+
+                <span class="s1">con</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+
+            <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">ClassNotFoundException </span><span class="s2">| </span><span class="s1">SQLException ex</span><span class="s2">) {</span>
+                <span class="s0">throw new </span><span class="s1">RuntimeException</span><span class="s2">(</span><span class="s1">ex</span><span class="s2">);</span>
+            <span class="s2">}</span>
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">e</span><span class="s2">.</span><span class="s1">getSource</span><span class="s2">() == </span><span class="s1">paypal</span><span class="s2">) {</span>
+            <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">dispose</span><span class="s2">();</span>
+            <span class="s1">setPaypal</span><span class="s2">();</span>
+
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">e</span><span class="s2">.</span><span class="s1">getSource</span><span class="s2">() == </span><span class="s1">pay_account</span><span class="s2">) {</span>
+            <span class="s1">String sender_amount </span><span class="s2">= </span><span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">();</span>
+            <span class="s1">String receiver_account_no </span><span class="s2">= </span><span class="s1">receiver_account</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">();</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">sender_amount</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">() || </span><span class="s1">receiver_account_no</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">()) {</span>
+                <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Please fill all fields&quot;</span><span class="s2">);</span>
+            <span class="s2">}</span>
+            <span class="s0">try </span><span class="s2">{</span>
+                <span class="s0">int </span><span class="s1">sendAmountValue </span><span class="s2">= </span><span class="s1">Integer</span><span class="s2">.</span><span class="s1">parseInt</span><span class="s2">(</span><span class="s1">sender_amount</span><span class="s2">);</span>
+                <span class="s0">int </span><span class="s1">currentBalance </span><span class="s2">= </span><span class="s1">Integer</span><span class="s2">.</span><span class="s1">parseInt</span><span class="s2">(</span><span class="s1">balance</span><span class="s2">);</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">sendAmountValue </span><span class="s2">&lt; </span><span class="s4">0</span><span class="s2">) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Value must be greater than 0&quot;</span><span class="s2">);</span>
+                    <span class="s0">return</span><span class="s2">;</span>
+                <span class="s2">}</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">sendAmountValue </span><span class="s2">&gt; </span><span class="s1">currentBalance</span><span class="s2">) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Insufficient balance&quot;</span><span class="s2">);</span>
+                    <span class="s0">return</span><span class="s2">;</span>
+                <span class="s2">}</span>
+                <span class="s0">int </span><span class="s1">new_balance </span><span class="s2">= </span><span class="s1">currentBalance </span><span class="s2">- </span><span class="s1">sendAmountValue</span><span class="s2">;</span>
+                <span class="s1">Class</span><span class="s2">.</span><span class="s1">forName</span><span class="s2">(</span><span class="s3">&quot;com.mysql.cj.jdbc.Driver&quot;</span><span class="s2">);</span>
+                <span class="s1">Connection con </span><span class="s2">= </span><span class="s1">DriverManager</span><span class="s2">.</span><span class="s1">getConnection</span><span class="s2">(</span><span class="s1">DB_URL</span><span class="s2">, </span><span class="s1">DB_USER</span><span class="s2">, </span><span class="s1">DB_PASSWORD</span><span class="s2">);</span>
+                <span class="s1">PreparedStatement smt </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s3">&quot;SELECT account FROM users WHERE account = ? &quot;</span><span class="s2">);</span>
+                <span class="s1">smt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">receiver_account_no</span><span class="s2">);</span>
+                <span class="s1">ResultSet receiverResult </span><span class="s2">= </span><span class="s1">smt</span><span class="s2">.</span><span class="s1">executeQuery</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(!</span><span class="s1">receiverResult</span><span class="s2">.</span><span class="s1">next</span><span class="s2">()) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Receiver is not found&quot;</span><span class="s2">);</span>
+                    <span class="s1">con</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+                <span class="s2">}</span>
+                <span class="s1">PreparedStatement sender_update </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s3">&quot;UPDATE users SET amount=? WHERE username = ? &quot;</span><span class="s2">);</span>
+                <span class="s1">sender_update</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">new_balance</span><span class="s2">);</span>
+                <span class="s1">sender_update</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">2</span><span class="s2">, </span><span class="s1">tf_user_name</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">());</span>
+                <span class="s1">PreparedStatement receiver_update </span><span class="s2">= </span><span class="s1">con</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s3">&quot;UPDATE users SET amount = amount+ ? WHERE account = ?&quot;</span><span class="s2">);</span>
+                <span class="s1">receiver_update</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s4">1</span><span class="s2">, </span><span class="s1">new_balance</span><span class="s2">);</span>
+                <span class="s1">receiver_update</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s4">2</span><span class="s2">, </span><span class="s1">receiver_account_no</span><span class="s2">);</span>
+                <span class="s0">int </span><span class="s1">senderUpdated </span><span class="s2">= </span><span class="s1">sender_update</span><span class="s2">.</span><span class="s1">executeUpdate</span><span class="s2">();</span>
+                <span class="s0">int </span><span class="s1">receiverUpdated </span><span class="s2">= </span><span class="s1">receiver_update</span><span class="s2">.</span><span class="s1">executeUpdate</span><span class="s2">();</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">senderUpdated </span><span class="s2">&gt; </span><span class="s4">0 </span><span class="s2">&amp;&amp; </span><span class="s1">receiverUpdated </span><span class="s2">&gt; </span><span class="s4">0</span><span class="s2">) {</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Payment Successful!&quot;</span><span class="s2">);</span>
+                    <span class="s1">current_balance</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;Current Balance :  ₹&quot; </span><span class="s2">+ </span><span class="s1">new_balance</span><span class="s2">);</span>
+                    <span class="s1">sent_amount</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;&quot;</span><span class="s2">);</span>
+                    <span class="s1">receiver_account</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s3">&quot;&quot;</span><span class="s2">);</span>
+                <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s3">&quot;Payment Failed&quot;</span><span class="s2">);</span>
+                <span class="s2">}</span>
+
+                <span class="s1">con</span><span class="s2">.</span><span class="s1">close</span><span class="s2">();</span>
+
+            <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">ClassNotFoundException </span><span class="s2">| </span><span class="s1">SQLException ex</span><span class="s2">) {</span>
+                <span class="s0">throw new </span><span class="s1">RuntimeException</span><span class="s2">(</span><span class="s1">ex</span><span class="s2">);</span>
+            <span class="s2">}</span>
+
+
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">e</span><span class="s2">.</span><span class="s1">getSource</span><span class="s2">()==</span><span class="s1">bank_account</span><span class="s2">) {</span>
+            <span class="s1">lg_frame</span><span class="s2">.</span><span class="s1">dispose</span><span class="s2">();</span>
+            <span class="s1">bank_transfer</span><span class="s2">();</span>
+        <span class="s2">}</span>
+
+
+    <span class="s2">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">itemStateChanged</span><span class="s2">(</span><span class="s1">ItemEvent e</span><span class="s2">) {</span>
+
+    <span class="s2">}</span>
+
+    <span class="s0">public static void </span><span class="s1">main</span><span class="s2">(</span><span class="s1">String</span><span class="s2">[] </span><span class="s1">args</span><span class="s2">) {</span>
+        <span class="s0">new </span><span class="s1">Payment</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+
+<span class="s2">}</span>
+
+
+
+</pre>
+</body>
+</html>
