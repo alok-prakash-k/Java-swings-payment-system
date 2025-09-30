@@ -859,12 +859,15 @@ class Payment extends JFrame implements ActionListener, ItemListener{
             bank_transfer();
         } else if (e.getSource()==logout) {
             pb_frame.dispose();
-//            cc_frame.dispose();
              new Payment();
 
         }else if(e.getSource()==logout_bt)
         {
             bt.dispose();
+            new Payment();
+        }else if(e.getSource()==logout_cc)
+        {
+            cc_frame.dispose();
             new Payment();
         }
 
