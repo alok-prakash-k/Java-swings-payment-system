@@ -612,7 +612,7 @@ class Payment extends JFrame implements ActionListener, ItemListener{
         logout_bt.setContentAreaFilled(false);
     }
 
-    @Override
+  @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == loginButton) {
             String name = tf_user_name.getText();
@@ -626,21 +626,16 @@ class Payment extends JFrame implements ActionListener, ItemListener{
                 smt.setString(2, new String(password));
                 ResultSet rs = smt.executeQuery();
                 if (rs.next()) {
-
                     f.dispose();
                     login();
                 } else {
                     JOptionPane.showMessageDialog(this, " Invalid username or password.");
                 }
-
                 con.close();
-
             } catch (ClassNotFoundException | SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
                 throw new RuntimeException(ex);
-
             }
-
 
         } else if (e.getSource() == registerButton) {
             f.dispose();
@@ -658,10 +653,8 @@ class Payment extends JFrame implements ActionListener, ItemListener{
                 JOptionPane.showMessageDialog(this, "Please fill all the fields");
             } else if (!email.matches("^[\\w.-]+@[\\w.-]+\\.\\w+$")) {
                 JOptionPane.showMessageDialog(this, "Invalid email address");
-
             } else if (!mobile.matches("\\d{10}")) {
                 JOptionPane.showMessageDialog(this, "Mobile number must be 10 digits");
-
             } else {
                 try {
                     int amount = Integer.parseInt(amount_str);
@@ -676,143 +669,70 @@ class Payment extends JFrame implements ActionListener, ItemListener{
                     smt.setInt(5, amount);
                     smt.setString(6, account);
                     smt.executeUpdate();
-                    JOptionPane.showMessageDialog(this, "done");
+                    JOptionPane.showMessageDialog(this, "Registration Successful");
                     con.close();
                     f_register.dispose();
                     new Payment();
+                } catch (NumberFormatException nfe) {
+                    JOptionPane.showMessageDialog(this, "Amount must be a number");
                 } catch (ClassNotFoundException ex) {
                     throw new RuntimeException(ex);
-                }catch (SQLException dupEx) {
-                    JOptionPane.showMessageDialog(this, "Username or email or Account  already exists!");
+                } catch (SQLException dupEx) {
+                    JOptionPane.showMessageDialog(this, "Username, email or Account already exists!");
                 }
-
             }
-
 
         } else if (e.getSource() == resetButton) {
             tf_user_name.setText("");
             pass_word.setText("");
 
-
-
-
         } else if (e.getSource() == credit_card) {
             lg_frame.dispose();
             payment_credit_card();
-        } else if (e.getSource() == pay) {
-            String sender_amount = sent_amount.getText().trim();
-            String receiver_user = receiver.getText().trim();
-            if (sender_amount.isEmpty() || receiver_user.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please fill all fields");
-            }
-            try {
-                int sendAmountValue = Integer.parseInt(sender_amount);
-                int currentBalance = Integer.parseInt(balance);
-                if (sendAmountValue < 0) {
-                    JOptionPane.showMessageDialog(this, "Value must be greater than 0");
-                    return;
-                }
-                if (sendAmountValue > currentBalance) {
-                    JOptionPane.showMessageDialog(this, "Insufficient balance");
-                    return;
-                }
-                int new_balance = currentBalance - sendAmountValue;
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-                PreparedStatement smt = con.prepareStatement("SELECT username FROM users WHERE username = ? ");
-                smt.setString(1, receiver_user);
-                ResultSet receiverResult = smt.executeQuery();
-                if (!receiverResult.next()) {
-                    JOptionPane.showMessageDialog(this, "Receiver is not found");
-                    con.close();
-                }
-                PreparedStatement sender_update = con.prepareStatement("UPDATE users SET amount=? WHERE username = ? ");
-                sender_update.setInt(1, new_balance);
-                sender_update.setString(2, tf_user_name.getText().trim());
-                PreparedStatement receiver_update = con.prepareStatement("UPDATE users SET amount = amount+ ? WHERE username = ?");
-                receiver_update.setInt(1, new_balance);
-                receiver_update.setString(2, receiver_user);
-                int senderUpdated = sender_update.executeUpdate();
-                int receiverUpdated = receiver_update.executeUpdate();
-                if (senderUpdated > 0 && receiverUpdated > 0) {
-                    JOptionPane.showMessageDialog(this, "Payment Successful!");
-                    current_balance.setText("Current Balance :  ₹" + new_balance);
-                    sent_amount.setText("");
-                    receiver.setText("");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Payment Failed");
-                }
 
-                con.close();
+        } else if (e.getSource() == bank_account) {
+            lg_frame.dispose();
+            bank_transfer();
 
-            } catch (ClassNotFoundException | SQLException ex) {
-                throw new RuntimeException(ex);
-            }
-
-
-        } else if (e.getSource() == pay_pal) {
-            String sender_amount = sent_amount.getText().trim();
-            String receiver_mail = receiver_email.getText().trim();
-            if (sender_amount.isEmpty() || receiver_mail.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please fill all fields");
-            }
-            try {
-                int sendAmountValue = Integer.parseInt(sender_amount);
-                int currentBalance = Integer.parseInt(balance);
-                if (sendAmountValue < 0) {
-                    JOptionPane.showMessageDialog(this, "Value must be greater than 0");
-                    return;
-                }
-                if (sendAmountValue > currentBalance) {
-                    JOptionPane.showMessageDialog(this, "Insufficient balance");
-                    return;
-                }
-                int new_balance = currentBalance - sendAmountValue;
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-                PreparedStatement smt = con.prepareStatement("SELECT email FROM users WHERE email = ? ");
-                smt.setString(1, receiver_mail);
-                ResultSet receiverResult = smt.executeQuery();
-                if (!receiverResult.next()) {
-                    JOptionPane.showMessageDialog(this, "Receiver is not found");
-                    con.close();
-                }
-                PreparedStatement sender_update = con.prepareStatement("UPDATE users SET amount=? WHERE username = ? ");
-                sender_update.setInt(1, new_balance);
-                sender_update.setString(2, tf_user_name.getText().trim());
-                PreparedStatement receiver_update = con.prepareStatement("UPDATE users SET amount = amount+ ? WHERE email = ?");
-                receiver_update.setInt(1, new_balance);
-                receiver_update.setString(2, receiver_mail);
-                int senderUpdated = sender_update.executeUpdate();
-                int receiverUpdated = receiver_update.executeUpdate();
-                if (senderUpdated > 0 && receiverUpdated > 0) {
-                    JOptionPane.showMessageDialog(this, "Payment Successful!");
-                    current_balance.setText("Current Balance :  ₹" + new_balance);
-                    sent_amount.setText("");
-                    receiver_email.setText("");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Payment Failed");
-                }
-
-                con.close();
-
-            } catch (ClassNotFoundException | SQLException ex) {
-                throw new RuntimeException(ex);
-            }
         } else if (e.getSource() == paypal) {
             lg_frame.dispose();
             setPaypal();
 
-        } else if (e.getSource() == pay_account) {
+        } else if (e.getSource() == logout || e.getSource() == logout_bt || e.getSource() == logout_cc) {
+            if(pb_frame != null) pb_frame.dispose();
+            if(bt != null) bt.dispose();
+            if(cc_frame != null) cc_frame.dispose();
+            new Payment();
+
+        } else if (e.getSource() == pay || e.getSource() == pay_pal || e.getSource() == pay_account) {
+            // Unified logic for all 3 payment buttons to avoid code duplication errors
             String sender_amount = sent_amount.getText().trim();
-            String receiver_account_no = receiver_account.getText().trim();
-            if (sender_amount.isEmpty() || receiver_account_no.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please fill all fields");
+            String receiver_info = "";
+            String receiver_col = "";
+            
+            // Determine which payment method is being used
+            if (e.getSource() == pay) {
+                receiver_info = receiver.getText().trim(); // Username
+                receiver_col = "username";
+            } else if (e.getSource() == pay_pal) {
+                receiver_info = receiver_email.getText().trim(); // Email
+                receiver_col = "email";
+            } else {
+                receiver_info = receiver_account.getText().trim(); // Account
+                receiver_col = "account";
             }
+
+            if (sender_amount.isEmpty() || receiver_info.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill all fields");
+                return;
+            }
+
+            Connection con = null;
             try {
                 int sendAmountValue = Integer.parseInt(sender_amount);
-                int currentBalance = Integer.parseInt(balance);
-                if (sendAmountValue < 0) {
+                int currentBalance = Integer.parseInt(balance); 
+
+                if (sendAmountValue <= 0) {
                     JOptionPane.showMessageDialog(this, "Value must be greater than 0");
                     return;
                 }
@@ -820,60 +740,68 @@ class Payment extends JFrame implements ActionListener, ItemListener{
                     JOptionPane.showMessageDialog(this, "Insufficient balance");
                     return;
                 }
-                int new_balance = currentBalance - sendAmountValue;
+
                 Class.forName("com.mysql.cj.jdbc.Driver");
-                Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-                PreparedStatement smt = con.prepareStatement("SELECT account FROM users WHERE account = ? ");
-                smt.setString(1, receiver_account_no);
-                ResultSet receiverResult = smt.executeQuery();
-                if (!receiverResult.next()) {
-                    JOptionPane.showMessageDialog(this, "Receiver is not found");
-                    con.close();
+                con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            
+                con.setAutoCommit(false); 
+
+                String checkQuery = "SELECT " + receiver_col + " FROM users WHERE " + receiver_col + " = ?";
+                PreparedStatement checkReceiver = con.prepareStatement(checkQuery);
+                checkReceiver.setString(1, receiver_info);
+                ResultSet rs = checkReceiver.executeQuery();
+                
+                if (!rs.next()) {
+                    JOptionPane.showMessageDialog(this, "Receiver not found");
+                    con.rollback(); 
+                    return;
                 }
-                PreparedStatement sender_update = con.prepareStatement("UPDATE users SET amount=? WHERE username = ? ");
-                sender_update.setInt(1, new_balance);
+                rs.close();
+                checkReceiver.close();
+      
+                int new_balance_sender = currentBalance - sendAmountValue;
+
+                PreparedStatement sender_update = con.prepareStatement("UPDATE users SET amount=? WHERE username = ?");
+                sender_update.setInt(1, new_balance_sender);
                 sender_update.setString(2, tf_user_name.getText().trim());
-                PreparedStatement receiver_update = con.prepareStatement("UPDATE users SET amount = amount+ ? WHERE account = ?");
-                receiver_update.setInt(1, new_balance);
-                receiver_update.setString(2, receiver_account_no);
-                int senderUpdated = sender_update.executeUpdate();
-                int receiverUpdated = receiver_update.executeUpdate();
-                if (senderUpdated > 0 && receiverUpdated > 0) {
-                    JOptionPane.showMessageDialog(this, "Payment Successful!");
-                    current_balance.setText("Current Balance :  ₹" + new_balance);
-                    sent_amount.setText("");
-                    receiver_account.setText("");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Payment Failed");
+                sender_update.executeUpdate();
+
+                String updateReceiverQuery = "UPDATE users SET amount = amount + ? WHERE " + receiver_col + " = ?";
+                PreparedStatement receiver_update = con.prepareStatement(updateReceiverQuery);
+                receiver_update.setInt(1, sendAmountValue);
+                receiver_update.setString(2, receiver_info);
+                receiver_update.executeUpdate();
+
+                con.commit(); 
+                JOptionPane.showMessageDialog(this, "Payment Successful!");
+                              
+                balance = String.valueOf(new_balance_sender);
+                current_balance.setText("Current Balance :  ₹" + balance);
+                
+                sent_amount.setText("");
+                if(receiver != null) receiver.setText("");
+                if(receiver_email != null) receiver_email.setText("");
+                if(receiver_account != null) receiver_account.setText("");
+
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid number");
+            } catch (Exception ex) {
+                try {
+                    if (con != null) con.rollback(); // Rollback on error
+                } catch (SQLException se) {
+                    se.printStackTrace();
                 }
-
-                con.close();
-
-            } catch (ClassNotFoundException | SQLException ex) {
-                throw new RuntimeException(ex);
+                JOptionPane.showMessageDialog(this, "Transaction Failed: " + ex.getMessage());
+                ex.printStackTrace();
+            } finally {
+                try {
+                    if (con != null) con.close();
+                } catch (SQLException se) {
+                    se.printStackTrace();
+                }
             }
-
-
-        } else if (e.getSource()==bank_account) {
-            lg_frame.dispose();
-            bank_transfer();
-        } else if (e.getSource()==logout) {
-            pb_frame.dispose();
-             new Payment();
-
-        }else if(e.getSource()==logout_bt)
-        {
-            bt.dispose();
-            new Payment();
-        }else if(e.getSource()==logout_cc)
-        {
-            cc_frame.dispose();
-            new Payment();
         }
-
-
     }
-
     @Override
     public void itemStateChanged(ItemEvent e) {
 
